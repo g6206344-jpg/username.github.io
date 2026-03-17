@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Followers UI Demo</title>
+<title>Followers UI</title>
 
 <style>
 * {
@@ -13,92 +13,116 @@
   font-family: Arial, sans-serif;
 }
 
+/* FULL SCREEN FIX */
+html, body {
+  height: 100%;
+}
+
 body {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #6a11cb, #ff3c6f);
 }
 
-/* Center container */
-.main-container {
+/* HEADER */
+.header {
+  text-align: center;
+  color: white;
+  padding: 20px 10px;
+}
+
+.header h1 {
+  font-size: 22px;
+  margin-bottom: 5px;
+}
+
+.header p {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+/* CENTER AREA */
+.main {
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
 }
 
-/* Card */
+/* CARD */
 .card {
-  background: #fff;
+  background: white;
   padding: 25px;
   border-radius: 15px;
-  width: 320px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  width: 90%;
+  max-width: 320px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   text-align: center;
 }
 
-/* Title */
 .card h2 {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
-/* Input */
+/* INPUT */
 input {
   width: 100%;
   padding: 12px;
-  margin: 10px 0;
+  margin: 8px 0;
   border-radius: 8px;
   border: 1px solid #ccc;
-  outline: none;
 }
 
-/* Button */
+/* BUTTON */
 button {
   width: 100%;
   padding: 12px;
   border: none;
   border-radius: 8px;
   background: #ff3c6f;
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
+  color: white;
+  font-size: 15px;
   margin-top: 10px;
+  cursor: pointer;
 }
 
 button:hover {
   opacity: 0.9;
 }
 
-/* Status text */
+/* STATUS */
 .status {
-  margin-top: 15px;
+  margin-top: 10px;
   font-size: 14px;
-  color: green;
 }
 
-/* Footer badges */
+/* FOOTER FIX (NO GAP) */
 .footer {
   display: flex;
   justify-content: space-around;
-  padding: 10px;
-  color: #fff;
+  padding: 12px;
+  color: white;
   font-size: 14px;
+  background: rgba(0,0,0,0.1);
 }
 </style>
 
 </head>
 <body>
 
-<div class="main-container">
+<div class="header">
+  <h1>🔥 Get Free Instagram Followers</h1>
+  <p>Increase your followers instantly</p>
+</div>
+
+<div class="main">
   <div class="card">
-    <h2>Followers Demo</h2>
+    <h2>Free Followers</h2>
 
     <input type="text" id="username" placeholder="Enter Username">
-    <input type="number" id="amount" placeholder="How many followers">
+    <input type="number" id="amount" placeholder="Followers amount">
 
-    <button onclick="sendFollowers()">Get Followers</button>
+    <button onclick="run()">Get Followers</button>
 
     <div class="status" id="status"></div>
   </div>
@@ -107,30 +131,30 @@ button:hover {
 <div class="footer">
   <span>⚡ Fast</span>
   <span>🔒 Secure</span>
-  <span>🚀 Demo UI</span>
+  <span>🚀 UI Demo</span>
 </div>
 
 <script>
-function sendFollowers() {
-  let user = document.getElementById("username").value;
-  let amount = document.getElementById("amount").value;
+function run() {
+  let u = document.getElementById("username").value;
+  let a = document.getElementById("amount").value;
 
-  if(user === "" || amount === "") {
-    document.getElementById("status").innerText = "Fill all fields!";
-    document.getElementById("status").style.color = "red";
+  let s = document.getElementById("status");
+
+  if(u === "" || a === "") {
+    s.style.color = "red";
+    s.innerText = "Fill all fields!";
     return;
   }
 
-  document.getElementById("status").style.color = "green";
-  document.getElementById("status").innerText = 
-    "Processing...";
+  s.style.color = "green";
+  s.innerText = "Processing...";
 
   setTimeout(() => {
-    document.getElementById("status").innerText = 
-      "Followers sent successfully (demo)";
+    s.innerText = "Done (demo)";
   }, 2000);
 }
 </script>
 
 </body>
-</html>
+  </html>
