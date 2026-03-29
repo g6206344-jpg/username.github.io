@@ -1,1 +1,596 @@
 
+Here is the complete HTML code that transforms the Gmail-style bot into a fully functional website, with all the same interactive elements and API-fetching logic.
+
+```html
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Gmail इन्फो बोट | असली API रिप्लाई</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Segoe UI', 'Google Sans', system-ui, 'Noto Sans', 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        /* Gmail style card container - now the main WEBSITE container */
+        .gmail-website {
+            max-width: 850px;
+            width: 100%;
+            height: 90vh;
+            background: #ffffff;
+            border-radius: 32px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.4), 0 8px 18px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        /* Gmail style header - website header */
+        .website-header {
+            background: #f6f8fc;
+            padding: 18px 24px;
+            border-bottom: 1px solid #e0e4e9;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .site-icon {
+            background: #1a73e8;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header-text {
+            flex: 1;
+        }
+
+        .header-text h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f1f2f;
+            letter-spacing: -0.2px;
+        }
+
+        .header-text p {
+            font-size: 0.8rem;
+            color: #5f6368;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .api-badge {
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        /* Chat / Content area - main website content panel */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            scroll-behavior: smooth;
+        }
+
+        /* Message bubbles - same as before */
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            animation: fadeIn 0.25s ease-out;
+        }
+
+        .user-message {
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+        }
+
+        .bubble {
+            padding: 12px 18px;
+            border-radius: 24px;
+            font-size: 0.95rem;
+            line-height: 1.45;
+            word-break: break-word;
+            white-space: pre-wrap;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+        }
+
+        .user-bubble {
+            background: #1a73e8;
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .bot-bubble {
+            background: #f1f3f4;
+            color: #1f1f2f;
+            border-bottom-left-radius: 6px;
+        }
+
+        .timestamp {
+            font-size: 0.7rem;
+            color: #8e8e93;
+            margin-top: 5px;
+            margin-left: 12px;
+            margin-right: 12px;
+        }
+
+        /* loading animation */
+        .typing-indicator {
+            background: #f1f3f4;
+            padding: 12px 18px;
+            border-radius: 24px;
+            border-bottom-left-radius: 6px;
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: #7c7e82;
+            border-radius: 50%;
+            display: inline-block;
+            animation: blink 1.2s infinite ease-in-out both;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes blink {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* Input area - Gmail style website footer input */
+        .input-area {
+            padding: 16px 24px 20px;
+            background: #ffffff;
+            border-top: 1px solid #eaeef2;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            background: #f8f9fc;
+            border-radius: 32px;
+            border: 1px solid #dadce0;
+            padding: 8px 8px 8px 20px;
+            transition: all 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #1a73e8;
+            box-shadow: 0 1px 3px rgba(26,115,232,0.2);
+            background: white;
+        }
+
+        .input-wrapper textarea {
+            flex: 1;
+            border: none;
+            background: transparent;
+            resize: none;
+            font-size: 0.95rem;
+            font-family: inherit;
+            padding: 8px 0;
+            max-height: 100px;
+            outline: none;
+            color: #202124;
+        }
+
+        .input-wrapper textarea::placeholder {
+            color: #9aa0a6;
+            font-weight: 400;
+        }
+
+        .send-btn {
+            background: #1a73e8;
+            border: none;
+            color: white;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 20px;
+            font-weight: 500;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: #0b5ed7;
+            transform: scale(0.96);
+        }
+
+        .send-btn:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* error toast */
+        .error-toast {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #d32f2f;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: fadeUp 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; bottom: 0; }
+            to { opacity: 1; bottom: 25px; }
+        }
+
+        /* Scrollbar */
+        .content-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        .content-area::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .content-area::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 550px) {
+            .message {
+                max-width: 92%;
+            }
+            .website-header {
+                padding: 12px 18px;
+            }
+            .content-area {
+                padding: 16px;
+            }
+        }
+
+        /* Additional website polish */
+        .site-footer-note {
+            font-size: 11px;
+            color: #5f6368;
+            margin-top: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="gmail-website">
+    <!-- Header: Gmail style info website header -->
+    <div class="website-header">
+        <div class="site-icon">
+            🌐
+        </div>
+        <div class="header-text">
+            <h1>Gmail इन्फो वेबसाइट</h1>
+            <p>
+                <span>🤖 असली API से रिप्लाई | वेबसाइट संस्करण</span>
+                <span class="api-badge">🔌 LIVE API मोड</span>
+                <span>✅ कोई फर्जी जवाब नहीं</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Main website content panel (formerly chat area) -->
+    <div class="content-area" id="contentArea">
+        <div class="message bot-message">
+            <div class="bubble bot-bubble">
+                🙏 नमस्ते! यह एक पूर्ण वेबसाइट है — Gmail इन्फो सिस्टम। <br>
+                आप जो भी संदेश भेजोगे, मैं वह API को भेजूंगा और <strong>सिर्फ वही रिप्लाई दिखाऊंगा जो API से आएगी</strong>। <br>
+                कोई फर्जी, हार्डकोडेड जवाब नहीं। 🚀
+            </div>
+            <span class="timestamp">अभी • वेबसाइट असिस्टेंट</span>
+        </div>
+    </div>
+
+    <!-- Input section for website interaction -->
+    <div class="input-area">
+        <div class="input-wrapper">
+            <textarea id="userInput" rows="1" placeholder="अपना सवाल या संदेश लिखें... (कोई भी मैसेज)" aria-label="संदेश लिखें"></textarea>
+            <button class="send-btn" id="sendBtn" aria-label="भेजें">➤</button>
+        </div>
+        <div class="site-footer-note">
+            🔐 हर मैसेज API को भेजा जाता है | दिखेगा वही जो API से मिले | यह एक पूर्ण वेबसाइट है
+        </div>
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // ⚡ GMAIL INFO WEBSITE - ONLY REAL API RESPONSE ⚡
+    // कोई फर्जी / हार्डकोडेड रिप्लाई नहीं होगी
+    // सिर्फ API endpoint से जो डाटा आएगा वही यूजर को दिखेगा
+    // यह कोड अब एक वेबसाइट के रूप में कार्य करता है - बिल्कुल वैसा ही फंक्शनलिटी, बस नाम बदला गया है
+    // --------------------------------------------------------------
+    
+    // ---------- 🔧 API CONFIGURATION ----------
+    // आप यहाँ अपनी खुद की API URL डाल सकते हो
+    // यह वेबसाइट GET या POST दोनों सपोर्ट करती है, डिफॉल्ट POST है
+    // 🌐 API ENDPOINT (आप इसे बदल सकते हो - यहाँ एक डेमो पब्लिक API लगाई है जो आपका भेजा हुआ text mirror करती है 
+    // लेकिन यह सिर्फ डेमो है। आप अपनी असली API URL लगा सकते हो)
+    // महत्वपूर्ण: यह website सिर्फ API से जो भी response.text आएगा वही दिखाएगा। 
+    
+    const API_URL = "https://abbas-apis.vercel.app/api/email?mail=sahillsultan53@gmail.com";   // डेमो API 
+    // 👆 यह डेमो पब्लिक API है जो एक डमी डेटा देती है, लेकिन हम इससे यह सुनिश्चित करेंगे कि कोई फर्जी मैसेज न हो।
+    // वास्तविक प्रोजेक्ट में आप यहाँ अपनी असली API URL डालेंगे।
+    
+    const API_METHOD = "POST";   // या "GET"
+    
+    // यह फंक्शन API से आए रिस्पॉन्स को सिर्फ टेक्स्ट में बदलता है (कोई फर्जीवाड़ा नहीं)
+    function parseResponseToText(responseData) {
+        // यहाँ हम वो टेक्स्ट निकालेंगे जो API से मिला है - बिना किसी manipulation के
+        try {
+            if (typeof responseData === 'string') {
+                return responseData.trim();
+            }
+            if (responseData && typeof responseData === 'object') {
+                // अगर API से कोई खास message/response फील्ड आए तो उसे प्राथमिकता दो
+                if (responseData.reply) return responseData.reply;
+                if (responseData.message) return responseData.message;
+                if (responseData.text) return responseData.text;
+                if (responseData.content) return responseData.content;
+                if (responseData.response) return responseData.response;
+                // अगर कुछ नहीं मिला तो पूरा JSON stringify करके दिखा दो (पारदर्शिता)
+                return JSON.stringify(responseData, null, 2);
+            }
+            return String(responseData);
+        } catch(e) {
+            return "API से डेटा पार्स करने में समस्या: " + String(responseData);
+        }
+    }
+    
+    // ---------- DOM elements ----------
+    const contentArea = document.getElementById('contentArea');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    
+    // Auto-resize textarea
+    userInput.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+    
+    // ---------- Helper: show message (only real content) ----------
+    function addMessage(text, isUser, apiRawData = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+        
+        const bubble = document.createElement('div');
+        bubble.className = `bubble ${isUser ? 'user-bubble' : 'bot-bubble'}`;
+        
+        // अगर यूजर मैसेज है तो सीधा टेक्स्ट दिखाओ
+        // अगर बॉट/वेबसाइट मैसेज है तो वह text सिर्फ API से आया हुआ होगा
+        bubble.textContent = text;
+        
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'timestamp';
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('hi-IN', { hour: '2-digit', minute:'2-digit' });
+        timeSpan.textContent = `${timeStr} • ${isUser ? 'आप' : 'वेबसाइट असिस्टेंट'}`;
+        
+        messageDiv.appendChild(bubble);
+        messageDiv.appendChild(timeSpan);
+        contentArea.appendChild(messageDiv);
+        
+        // scroll to bottom
+        contentArea.scrollTop = contentArea.scrollHeight;
+        return messageDiv;
+    }
+    
+    // Loading indicator (typing)
+    let loadingElement = null;
+    function showTyping() {
+        if (loadingElement) return;
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'message bot-message';
+        loadingDiv.id = 'typingLoader';
+        const typingBubble = document.createElement('div');
+        typingBubble.className = 'typing-indicator';
+        typingBubble.innerHTML = '<span></span><span></span><span></span>';
+        loadingDiv.appendChild(typingBubble);
+        const fakeTime = document.createElement('span');
+        fakeTime.className = 'timestamp';
+        fakeTime.textContent = 'वेबसाइट प्रतिक्रिया दे रही है...';
+        loadingDiv.appendChild(fakeTime);
+        contentArea.appendChild(loadingDiv);
+        contentArea.scrollTop = contentArea.scrollHeight;
+        loadingElement = loadingDiv;
+    }
+    
+    function hideTyping() {
+        if (loadingElement) {
+            loadingElement.remove();
+            loadingElement = null;
+        }
+    }
+    
+    // ---------- show error toast (API fail पर भी कोई फर्जी रिप्लाई नहीं, सिर्फ एरर दिखेगी) ----------
+    function showErrorToast(message) {
+        const existingToast = document.querySelector('.error-toast');
+        if(existingToast) existingToast.remove();
+        const toast = document.createElement('div');
+        toast.className = 'error-toast';
+        toast.textContent = `⚠️ ${message}`;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            if(toast) toast.remove();
+        }, 4000);
+    }
+    
+    // ---------- CORE: API CALL - ONLY REAL DATA (NO FAKE) ----------
+    async function sendMessageToAPI(userText) {
+        // यह फंक्शन API से असली डेटा लाकर देगा, कभी भी फर्जी reply नहीं बनाएगा
+        // अगर API फेल हो जाती है तो error फेंकेगा, और website उस error को दिखाएगा (fake नहीं)
+        
+        let requestBody;
+        let headers = {
+            'Content-Type': 'application/json',
+        };
+        
+        // कस्टमाइज़ेबल: यहाँ आप अपनी API की आवश्यकता अनुसार body बना सकते हो
+        if (API_METHOD === 'POST') {
+            requestBody = JSON.stringify({
+                message: userText,
+                text: userText,
+                query: userText,
+                input: userText,
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        let url = API_URL;
+        let finalUrl = url;
+        if (API_METHOD === 'GET') {
+            const params = new URLSearchParams();
+            params.append('q', userText);
+            params.append('message', userText);
+            finalUrl = `${url}?${params.toString()}`;
+        }
+        
+        const fetchOptions = {
+            method: API_METHOD,
+            headers: headers,
+        };
+        
+        if (API_METHOD === 'POST') {
+            fetchOptions.body = requestBody;
+        }
+        
+        try {
+            const response = await fetch(finalUrl, fetchOptions);
+            if (!response.ok) {
+                throw new Error(`API error ${response.status}: ${response.statusText}`);
+            }
+            const contentType = response.headers.get('content-type');
+            let apiData;
+            if (contentType && contentType.includes('application/json')) {
+                apiData = await response.json();
+            } else {
+                apiData = await response.text();
+            }
+            // असली डेटा को टेक्स्ट में बदलें (बिना किसी fake modification के)
+            const realReplyText = parseResponseToText(apiData);
+            // अगर API से खाली स्ट्रिंग आए तो भी वही दिखेगी, कोई डिफॉल्ट फर्जी नहीं
+            if (!realReplyText || realReplyText.trim() === '') {
+                return "⚠️ [API से खाली जवाब मिला] कोई फर्जी संदेश नहीं डाला गया।";
+            }
+            return realReplyText;
+        } catch (error) {
+            console.error("API call failed:", error);
+            // क्रिटिकल: यहाँ हम कोई फर्जी रिप्लाई नहीं लौटाते, बल्कि एरर मैसेज लौटाते हैं जो यूजर को दिखेगा।
+            throw new Error(`API कनेक्शन फेल: ${error.message}`);
+        }
+    }
+    
+    // ---------- main send message flow (NO FAKE MESSAGE EVER) - website version ----------
+    let isProcessing = false;
+    
+    async function handleSendMessage() {
+        if (isProcessing) return;
+        const rawMessage = userInput.value.trim();
+        if (rawMessage === "") return;
+        
+        // 1. यूजर का मैसेज UI में दिखाओ (यह तो यूजर ने खुद लिखा है)
+        addMessage(rawMessage, true);
+        userInput.value = "";
+        userInput.style.height = "auto";
+        
+        // 2. website assistant के लिए typing indicator
+        showTyping();
+        isProcessing = true;
+        sendBtn.disabled = true;
+        
+        try {
+            // 3. असली API कॉल - ONLY REAL DATA
+            const botRealReply = await sendMessageToAPI(rawMessage);
+            
+            // 4. typing हटाओ और API से मिली असली reply दिखाओ
+            hideTyping();
+            addMessage(botRealReply, false);
+            
+        } catch (err) {
+            // अगर API फेल हो जाती है -> कोई फर्जी नहीं, बल्कि एरर मैसेज दिखाएँगे (लेकिन एरर भी सच्ची स्थिति है)
+            hideTyping();
+            const errorMessage = `❌ API त्रुटि: ${err.message}`;
+            addMessage(errorMessage, false);
+            showErrorToast(err.message);
+        } finally {
+            isProcessing = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+    }
+    
+    // Event listeners for sending
+    sendBtn.addEventListener('click', handleSendMessage);
+    userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSendMessage();
+        }
+    });
+    
+    // Focus on load
+    userInput.focus();
+    
+    // Additional website metadata: ensure that no hardcoded replies are ever injected
+    // Pure API-driven interaction. The website is fully fun
